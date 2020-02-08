@@ -6,11 +6,10 @@ class App extends Component {
     users: []
   };
 
-  componentWillMount() {
+  getUsers() {
     axios
       .get("https://api.randomuser.me/?nat=US&results=5")
       .then(response => {
-        console.log(response);
         this.setState({ users: response.data.results });
       })
       .catch(err => {
@@ -18,10 +17,22 @@ class App extends Component {
       });
   }
 
+  componentWillMount() {
+    this.getUsers();
+  }
+
   render() {
     return (
       <div>
-        <h1>Hello World</h1>
+        {this.state.users.map((user, id) => {
+          return (
+            <div key={id}>
+              <h2>{user.name.first}</h2>
+              <h3>{user.email}</h3>
+              <hr />
+            </div>
+          );
+        })}
       </div>
     );
   }
