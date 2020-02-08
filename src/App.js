@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import Loading from "./loading";
 
 class App extends Component {
   state = {
@@ -8,20 +9,27 @@ class App extends Component {
   };
 
   getUsers() {
-    this.setState({ loading: true });
     axios
       .get("https://api.randomuser.me/?nat=US&results=5")
       .then(response => {
-        this.setState({ loading: false });
-        this.setState({ users: response.data.results });
+        let setData = [...this.state.users, ...response.data.results];
+        this.setState({ users: setData });
       })
       .catch(err => {
         console.log("Error is ", err.message);
       });
   }
 
-  componentWillMount() {
+  handleSubmit = event => {
+    event.preventDefault();
     this.getUsers();
+    console.log("more users loaded");
+  };
+
+  componentWillMount() {
+    this.setState({ loading: true });
+    this.getUsers();
+    this.setState({ loading: false });
   }
 
   render() {
@@ -31,11 +39,14 @@ class App extends Component {
           <h2>{user.name.first}</h2>
           <h3>{user.email}</h3>
           <hr />
+          <form onSubmit={this.handleSubmit}>
+            <input type="submit" value="Load User" />
+          </form>
         </div>
       );
     });
     if (this.state.loading) {
-      data = <h1>Loading...</h1>;
+      data = <Loading message="Hey Hey" />;
     }
     return <div>{data}</div>;
   }
